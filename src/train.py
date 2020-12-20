@@ -46,8 +46,8 @@ def train(trainloader, net, device):
 
     return net
 
-def main():
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+def main(model, cpu):
+    device = torch.device("cuda:0" if torch.cuda.is_available() and not cpu else "cpu")
 
     print(f"Loading images")
     trainloader = load_data()
@@ -60,8 +60,12 @@ def main():
     print(f"Training done in {train_end-train_start:.3f} sec")
 
     # Save the trained NN
-    PATH = './cifar_net.pth'
-    torch.save(net.state_dict(), PATH)
+    path = f"./models/{model}.pth" if ".pth" not in model else f"./models/{model}"
+    torch.save(net.state_dict(), path)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Test the given NN against the CIFAR10 data')
+    parser.add_argument('model', help="Name of the file containing the model")
+    parser.add_argument('--cpu', dest='cpu', action='store_const', const=True, default=False, help='Force to use CPU for the training')
+    args = parser.parse_args()
+    main(args.model, args.cpu)

@@ -41,9 +41,10 @@ def show_random_results(testloader, net):
 
     imshow(torchvision.utils.make_grid(images), [classes[predicted[j]] for j in range(4)])
 
-def main():
+def main(model):
     net = Net()
-    net.load_state_dict(torch.load("./cifar_net.pth"))
+    model_file = f"./models/{model}" if ".pth" in model else f"./models/{model}.pth"
+    net.load_state_dict(torch.load(model_file))
 
     y = []
     y_pred = []
@@ -57,4 +58,8 @@ def main():
     print(classification_report(y, y_pred, target_names=classes))
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Test the given NN against the CIFAR10 data')
+    parser.add_argument('model', help="Name of the file containing the model")
+    args = parser.parse_args()
+
+    main(args.model)
